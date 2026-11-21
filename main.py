@@ -1,26 +1,32 @@
-"""Entry program for make.fun bounty news-image-20261120.
+"""Entry point for the news-image-20261120 bounty submission.
 
-"Sum up 20 November's world news in one image": the front page was rendered
-ahead of time by render.py into entry.png, which sits next to this file.
-This program copies that image to the output directory the grader reads:
-$MAKEFUN_OUTPUT_DIR/entry.png when the variable is set, else
-/output/entry.png.
+The front page for 20 November 2026 was drawn ahead of time by render.py
+and stored as entry.png beside this file. The grader reads its output from
+a directory ($MAKEFUN_OUTPUT_DIR, defaulting to /output), so this program
+simply copies the stored image there under the expected name.
 
-Python 3 standard library only. No network access. Deterministic: the
-output bytes are exactly the bytes of the bundled entry.png.
+Standard library only, no network, deterministic: the bytes written are
+exactly the bytes of the bundled entry.png.
 """
 
 import os
 import shutil
 import sys
+from pathlib import Path
+
+
+def entry_image() -> Path:
+    return Path(__file__).resolve().parent / "entry.png"
+
+
+def output_dir() -> Path:
+    return Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
 
 
 def main() -> int:
-    here = os.path.dirname(os.path.abspath(__file__))
-    source = os.path.join(here, "entry.png")
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    os.makedirs(out_dir, exist_ok=True)
-    shutil.copyfile(source, os.path.join(out_dir, "entry.png"))
+    target_dir = output_dir()
+    target_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(entry_image(), target_dir / "entry.png")
     return 0
 
 
